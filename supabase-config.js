@@ -95,31 +95,32 @@ const Supabase = (() => {
     return insert('wash_history', { hostel_id: hostelId, ...entry });
   }
 
-  // ----- Queue helpers -----
-  async function getQueueEntries(hostelId) {
-    return query('queue_entries', `hostel_id=eq.${encodeURIComponent(hostelId)}&order=joined_at.asc`);
+  // ----- Queue helpers (stored in machines.queue_members JSONB) -----
+  // queue_members format: [{name, room, joinedAt}, ...] sorted by joinedAt
+
+  async function getQueueForMachine(hostelId, machineKey) {
+    const rows = await query('machines', `hostel_id=eq.${encodeURIComponent(hostelId)}&machine_key=eq.${encodeURIComponent(machineKey)}&select=queue_members`);
+    return (rows.length > 0 && rows[0].queue_members) ? rows[0].queue_members : [];
   }
 
-  async function addQueueEntry(hostelId, machineKey, userName, room) {
-    return insert('queue_entries', { hostel_id: hostelId, machine_key: machineKey, user_name: userName, room });
+  async function joinMachineQueue(hostelId, machineKey, userName, room) {
+    const queue = await getQueueForMachine(hostelId, machineKey);
+    if (queue.some(q => q.name === userName)) return queue; // already in queue
+    queue.push({ name: userName, room: room || '', joinedAt: Date.now() });
+    queue.sort((a, b) => a.joinedAt - b.joinedAt);
+    await updateMachine(hostelId, machineKey, { queue_members: queue });
+    return queue;
   }
 
-  async function removeQueueEntry(hostelId, machineKey, userName) {
-    const params = `hostel_id=eq.${encodeURIComponent(hostelId)}&machine_key=eq.${encodeURIComponent(machineKey)}&user_name=eq.${encodeURIComponent(userName)}`;
-    const res = await fetch(`${SUPABASE_URL}/rest/v1/queue_entries?${params}`, {
-      method: 'DELETE',
-      headers,
-    });
-    return res.ok;
+  async function leaveMachineQueue(hostelId, machineKey, userName) {
+    const queue = await getQueueForMachine(hostelId, machineKey);
+    const updated = queue.filter(q => q.name !== userName);
+    await updateMachine(hostelId, machineKey, { queue_members: updated });
+    return updated;
   }
 
   async function clearMachineQueue(hostelId, machineKey) {
-    const params = `hostel_id=eq.${encodeURIComponent(hostelId)}&machine_key=eq.${encodeURIComponent(machineKey)}`;
-    const res = await fetch(`${SUPABASE_URL}/rest/v1/queue_entries?${params}`, {
-      method: 'DELETE',
-      headers,
-    });
-    return res.ok;
+    return updateMachine(hostelId, machineKey, { queue_members: [] });
   }
 
   return {
@@ -127,7 +128,7 @@ const Supabase = (() => {
     getHostel, createHostel, updateHostelQR,
     getMachines, addMachine, deleteMachine, updateMachine,
     getWashHistory, addWashHistory,
-    getQueueEntries, addQueueEntry, removeQueueEntry, clearMachineQueue,
+    getQueueForMachine, joinMachineQueue, leaveMachineQueue, clearMachineQueue,
   };
 })();
 

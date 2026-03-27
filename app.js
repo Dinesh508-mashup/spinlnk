@@ -117,19 +117,14 @@ const App = (() => {
     popup.style.display = 'none';
   }
 
-  // ----- Fetch live queue from Supabase -----
+  // ----- Fetch live queue from Supabase (reads queue_members from machines table) -----
   async function fetchLiveQueues() {
     if (!hostelId) return null;
     try {
-      const dbQueue = await Supabase.getQueueEntries(hostelId);
+      const dbMachines = await Supabase.getMachines(hostelId);
       const queueMap = {};
-      dbQueue.forEach(q => {
-        if (!queueMap[q.machine_key]) queueMap[q.machine_key] = [];
-        queueMap[q.machine_key].push({
-          name: q.user_name,
-          room: q.room,
-          joinedAt: new Date(q.joined_at).getTime(),
-        });
+      dbMachines.forEach(m => {
+        queueMap[m.machine_key] = m.queue_members || [];
       });
       setStore('machineQueues', queueMap);
       return queueMap;
@@ -734,6 +729,13 @@ const App = (() => {
           const list = dbMachines.map(m => ({ id: m.machine_key, name: m.name, type: m.type }));
           setStore('adminMachineList', list);
           state.machines = getInitialMachines();
+
+          // Sync queue_members to localStorage
+          const queueMap = {};
+          dbMachines.forEach(m => {
+            queueMap[m.machine_key] = m.queue_members || [];
+          });
+          setStore('machineQueues', queueMap);
         }
       } catch (err) {
         console.error('DB load error, using localStorage:', err);
