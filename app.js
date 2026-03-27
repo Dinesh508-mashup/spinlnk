@@ -797,8 +797,19 @@ const App = (() => {
     });
   }
 
+  // ----- Show hostel name -----
+  async function showHostelInfo() {
+    const label = $('#home-hostel-name');
+    if (!label || !hostelId) return;
+    try {
+      const hostel = await Supabase.getHostel(hostelId);
+      if (hostel) label.textContent = hostel.name;
+    } catch (e) { /* keep default */ }
+  }
+
   // ----- Init -----
   async function init() {
+    showHostelInfo();
     await loadMachineState();
     await renderMachines();
     checkAlerts();

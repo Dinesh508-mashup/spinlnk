@@ -326,8 +326,35 @@ const Queue = (() => {
     setInterval(render, 15000);
   }
 
+  // ----- Show hostel name -----
+  async function showHostelInfo() {
+    const label = $('#queue-hostel-name');
+    if (!label) return;
+    if (!hostelId) {
+      label.textContent = 'No hostel linked. Scan a valid QR code.';
+      return;
+    }
+    try {
+      const hostel = await Supabase.getHostel(hostelId);
+      if (hostel) {
+        label.textContent = hostel.name;
+      } else {
+        label.textContent = `Hostel: ${hostelId}`;
+      }
+    } catch (e) {
+      label.textContent = `Hostel: ${hostelId}`;
+    }
+  }
+
   // ----- Init -----
-  function init() {
+  async function init() {
+    await showHostelInfo();
+
+    if (!hostelId) {
+      $('#queue-machine-list').innerHTML = '<p class="empty-state">No hostel linked. Scan a valid QR code to view machines.</p>';
+      return;
+    }
+
     startAutoRefresh();
 
     $('#modal-save').addEventListener('click', saveNameAndJoin);
