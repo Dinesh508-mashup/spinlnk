@@ -81,11 +81,36 @@ const Queue = (() => {
         Supabase.getQueueEntries(hostelId),
       ]);
 
-      // Update local machine definitions
-      if (dbMachines.length > 0) {
-        const list = dbMachines.map(m => ({ id: m.machine_key, name: m.name, type: m.type }));
-        setStore('adminMachineList', list);
-      }
+      // Build full machine list with live status from DB
+      const machines = dbMachines.map(m => {
+        const base = {
+          id: m.machine_key,
+          name: m.name,
+          type: m.type || 'washer',
+          status: m.status || 'free',
+          user: m.user_name || null,
+          room: m.room || null,
+          cycle: m.cycle || null,
+          endTime: m.end_time || null,
+        };
+        // Auto-free if timer expired
+        if (base.status === 'in-use' && base.endTime && Date.now() >= base.endTime) {
+          base.status = 'free';
+          base.user = null;
+          base.room = null;
+          base.cycle = null;
+          base.endTime = null;
+        }
+        return base;
+      });
+
+      // Update local storage to stay in sync
+      const list = dbMachines.map(m => ({ id: m.machine_key, name: m.name, type: m.type }));
+      setStore('adminMachineList', list);
+      const stateData = machines.map(m => ({
+        id: m.id, status: m.status, user: m.user, room: m.room, cycle: m.cycle, endTime: m.endTime,
+      }));
+      setStore('machineState', stateData);
 
       // Build queue map from DB
       const queueMap = {};
@@ -99,7 +124,7 @@ const Queue = (() => {
       });
       setStore('machineQueues', queueMap);
 
-      return { machines: getMachines(), queues: queueMap };
+      return { machines, queues: queueMap };
     } catch (err) {
       console.error('Supabase fetch error:', err);
       return null;

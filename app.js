@@ -636,13 +636,48 @@ const App = (() => {
       id: m.id, status: m.status, user: m.user, room: m.room, cycle: m.cycle, endTime: m.endTime,
     }));
     setStore('machineState', data);
+
+    // Sync each machine status to Supabase
+    if (hostelId) {
+      data.forEach(m => {
+        Supabase.updateMachine(hostelId, m.id, {
+          status: m.status,
+          user_name: m.user || null,
+          room: m.room || null,
+          cycle: m.cycle || null,
+          end_time: m.endTime || null,
+        }).catch(err => console.error('DB sync error:', err));
+      });
+    }
   }
 
-  function loadMachineState() {
+  async function loadMachineState() {
     // Re-read machine list from admin panel (picks up adds/deletes)
     state.machines = getInitialMachines();
 
-    const saved = getStore('machineState', []);
+    // Try fetching live state from Supabase first
+    let saved = getStore('machineState', []);
+    if (hostelId) {
+      try {
+        const dbMachines = await Supabase.getMachines(hostelId);
+        if (dbMachines.length > 0) {
+          saved = dbMachines.map(m => ({
+            id: m.machine_key,
+            status: m.status || 'free',
+            user: m.user_name,
+            room: m.room,
+            cycle: m.cycle,
+            endTime: m.end_time,
+          }));
+          // Also update local machine definitions
+          const list = dbMachines.map(m => ({ id: m.machine_key, name: m.name, type: m.type }));
+          setStore('adminMachineList', list);
+          state.machines = getInitialMachines();
+        }
+      } catch (err) {
+        console.error('DB load error, using localStorage:', err);
+      }
+    }
     saved.forEach(s => {
       const machine = state.machines.find(m => m.id === s.id);
       if (!machine) return;
