@@ -284,15 +284,20 @@ const Admin = (() => {
   }
 
   // ===== QR Code Generation (using qrcode.js library) =====
-  function drawQR(canvasId, text) {
-    const canvas = document.getElementById(canvasId);
-    if (!canvas) return;
-    QRCode.toCanvas(canvas, text, {
+  function drawQR(containerId, text) {
+    const container = document.getElementById(containerId);
+    if (!container) return;
+    QRCode.toDataURL(text, {
       width: 200,
       margin: 2,
       color: { dark: '#2c3e50', light: '#ffffff' },
-    }, (err) => {
-      if (err) console.error('QR generation error:', err);
+      errorCorrectionLevel: 'M',
+    }, (err, url) => {
+      if (err) {
+        console.error('QR generation error:', err);
+        return;
+      }
+      container.innerHTML = `<img src="${url}" alt="QR Code" class="qr-img" style="width:200px;height:200px;border-radius:4px;">`;
     });
   }
 
@@ -301,11 +306,11 @@ const Admin = (() => {
 
     // Machine QR — links to index.html with hostel param
     const machineUrl = `${baseUrl}index.html?hostel=${hostelId}`;
-    drawQR('qr-machine-canvas', machineUrl);
+    drawQR('qr-machine-container', machineUrl);
 
     // Room QR — links to queue.html with hostel param
     const roomUrl = `${baseUrl}queue.html?hostel=${hostelId}`;
-    drawQR('qr-room-canvas', roomUrl);
+    drawQR('qr-room-container', roomUrl);
 
     // Save QR URLs to Supabase
     try {
@@ -313,13 +318,14 @@ const Admin = (() => {
     } catch (err) { console.error('QR save error:', err); }
   }
 
-  function downloadQRAsSVG(canvasId, filename) {
-    const canvas = document.getElementById(canvasId);
-    if (!canvas) return;
-    const dataUrl = canvas.toDataURL('image/png');
+  function downloadQRAsSVG(containerId, filename) {
+    const container = document.getElementById(containerId);
+    const img = container ? container.querySelector('img') : null;
+    if (!img) return;
+    const dataUrl = img.src;
 
-    const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${canvas.width}" height="${canvas.height}">
-      <image href="${dataUrl}" width="${canvas.width}" height="${canvas.height}"/>
+    const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200">
+      <image href="${dataUrl}" width="200" height="200"/>
     </svg>`;
 
     const blob = new Blob([svg], { type: 'image/svg+xml' });
@@ -332,10 +338,11 @@ const Admin = (() => {
     showToast('QR downloaded!');
   }
 
-  function printQR(canvasId) {
-    const canvas = document.getElementById(canvasId);
-    if (!canvas) return;
-    const dataUrl = canvas.toDataURL('image/png');
+  function printQR(containerId) {
+    const container = document.getElementById(containerId);
+    const img = container ? container.querySelector('img') : null;
+    if (!img) return;
+    const dataUrl = img.src;
     const win = window.open('', '_blank');
     win.document.write(`
       <html><head><title>Print QR</title><style>
@@ -377,11 +384,11 @@ const Admin = (() => {
 
     // QR download/print
     $('#btn-download-machine-qr').addEventListener('click', () => {
-      downloadQRAsSVG('qr-machine-canvas', `spinlnk-${hostelId}-machine-qr.svg`);
+      downloadQRAsSVG('qr-machine-container', `spinlnk-${hostelId}-machine-qr.svg`);
     });
-    $('#btn-print-machine-qr').addEventListener('click', () => printQR('qr-machine-canvas'));
-    $('#btn-download-room-qr').addEventListener('click', () => downloadQRAsSVG('qr-room-canvas', `spinlnk-${hostelId}-room-qr.svg`));
-    $('#btn-print-room-qr').addEventListener('click', () => printQR('qr-room-canvas'));
+    $('#btn-print-machine-qr').addEventListener('click', () => printQR('qr-machine-container'));
+    $('#btn-download-room-qr').addEventListener('click', () => downloadQRAsSVG('qr-room-container', `spinlnk-${hostelId}-room-qr.svg`));
+    $('#btn-print-room-qr').addEventListener('click', () => printQR('qr-room-container'));
 
     // Enter key on login
     $('#admin-password').addEventListener('keydown', (e) => {
