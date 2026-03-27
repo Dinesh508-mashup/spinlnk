@@ -1,7 +1,7 @@
 // ===== SpinLnk — App Configuration =====
 
 // ---- CHANGE THIS to your Vercel URL when ready ----
-const SPINLNK_BASE_URL = 'https://YOUR_VERCEL_URL.vercel.app/';
+const SPINLNK_BASE_URL = 'https://spinlnk.vercel.app/';
 // ---------------------------------------------------
 
 // ===== Supabase Configuration =====
