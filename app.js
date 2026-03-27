@@ -444,11 +444,12 @@ const App = (() => {
   }
 
   // ----- Render Queue Status Screen -----
-  function renderQueueStatus() {
+  async function renderQueueStatus() {
     const container = $('#queue-status-list');
     if (!container) return;
 
-    const queues = getStore('machineQueues', {});
+    const liveQueues = await fetchLiveQueues();
+    const queues = liveQueues || getStore('machineQueues', {});
 
     container.innerHTML = state.machines.map(m => {
       const isFree = m.status === 'free';
@@ -496,7 +497,7 @@ const App = (() => {
     }).join('');
   }
 
-  // ----- Queue Notification (reads from shared localStorage) -----
+  // ----- Queue Notification -----
   function notifyQueueOnFree(machineId) {
     const queues = getStore('machineQueues', {});
     const queue = queues[machineId] || [];
@@ -507,6 +508,11 @@ const App = (() => {
       );
       queues[machineId] = [];
       setStore('machineQueues', queues);
+    }
+    // Also clear queue in Supabase
+    if (hostelId) {
+      Supabase.clearMachineQueue(hostelId, machineId)
+        .catch(err => console.error('DB queue clear error:', err));
     }
   }
 
@@ -640,7 +646,7 @@ const App = (() => {
   }
 
   // ----- Free Machine -----
-  function freeMachine(machine) {
+  async function freeMachine(machine) {
     delete state.alarmedMachines[machine.id];
     stopAlarm();
     machine.status = 'free';
@@ -649,7 +655,7 @@ const App = (() => {
     machine.cycle = null;
     machine.endTime = null;
     saveMachineState();
-    renderMachines();
+    await renderMachines();
   }
 
   // ----- Notifications -----
@@ -774,9 +780,9 @@ const App = (() => {
   }
 
   // ----- Init -----
-  function init() {
-    loadMachineState();
-    renderMachines();
+  async function init() {
+    await loadMachineState();
+    await renderMachines();
     checkAlerts();
     initNav();
     initCycleOptions();
@@ -791,6 +797,17 @@ const App = (() => {
     requestNotificationPermission();
 
     handleQRParam();
+
+    // Auto-refresh from Supabase every 15s to sync across devices
+    setInterval(async () => {
+      await loadMachineState();
+      const activeScreen = document.querySelector('.screen.active');
+      if (activeScreen) {
+        if (activeScreen.id === 'screen-home') await renderMachines();
+        if (activeScreen.id === 'screen-bookings') renderBookings();
+        if (activeScreen.id === 'screen-queue') await renderQueueStatus();
+      }
+    }, 15000);
 
     if ('serviceWorker' in navigator) {
       navigator.serviceWorker.register('sw.js').catch(() => {});
