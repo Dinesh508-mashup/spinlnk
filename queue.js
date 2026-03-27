@@ -1,0 +1,267 @@
+// ===== SpinLnk — Queue Page =====
+
+const Queue = (() => {
+  const $ = (sel) => document.querySelector(sel);
+  const $$ = (sel) => document.querySelectorAll(sel);
+
+  // ----- Hostel ID from URL -----
+  const urlParams = new URLSearchParams(window.location.search);
+  const hostelId = urlParams.get('hostel') || localStorage.getItem('spinlnk_userHostel') || null;
+  if (hostelId) localStorage.setItem('spinlnk_userHostel', hostelId);
+
+  function hKey(name) { return hostelId ? `spinlnk_${hostelId}_${name}` : name; }
+  function getStore(name, fallback) {
+    const raw = localStorage.getItem(hKey(name));
+    return raw ? JSON.parse(raw) : fallback;
+  }
+  function setStore(name, value) { localStorage.setItem(hKey(name), JSON.stringify(value)); }
+
+  // Read shared machine state from localStorage (synced with admin panel)
+  function getMachines() {
+    const definitions = getStore('adminMachineList', [
+      { id: 'A', name: 'Machine A', type: 'washer' },
+      { id: 'B', name: 'Machine B', type: 'washer' },
+    ]);
+    const saved = getStore('machineState', []);
+    return definitions.map(d => {
+      const base = { id: d.id, name: d.name, type: d.type || 'washer', status: 'free', user: null, room: null, cycle: null, endTime: null };
+      const s = saved.find(m => m.id === d.id);
+      if (!s) return base;
+      if (s.status === 'in-use' && s.endTime && Date.now() >= s.endTime) {
+        return base;
+      }
+      return { ...base, ...s };
+    });
+  }
+
+  function getQueues() {
+    return getStore('machineQueues', {});
+  }
+
+  function saveQueues(queues) {
+    setStore('machineQueues', queues);
+  }
+
+  function getUserName() {
+    return localStorage.getItem('userName') || '';
+  }
+
+  function formatMinsLeft(endTime) {
+    return Math.max(0, Math.ceil((endTime - Date.now()) / 60000));
+  }
+
+  function timeAgo(timestamp) {
+    if (!timestamp) return 'just now';
+    const diff = Math.floor((Date.now() - timestamp) / 60000);
+    if (diff < 1) return 'just now';
+    if (diff === 1) return '1 min ago';
+    if (diff < 60) return `${diff}m ago`;
+    return `${Math.floor(diff / 60)}h ago`;
+  }
+
+  // ----- Toast -----
+  function showToast(message) {
+    let toast = $('.toast');
+    if (!toast) {
+      toast = document.createElement('div');
+      toast.className = 'toast';
+      document.body.appendChild(toast);
+    }
+    toast.textContent = message;
+    toast.classList.add('show');
+    setTimeout(() => toast.classList.remove('show'), 3000);
+  }
+
+  // ----- Render In-Use Machines with Queue -----
+  function render() {
+    const machines = getMachines();
+    const queues = getQueues();
+    const userName = getUserName();
+
+    const queueContainer = $('#queue-machine-list');
+    const availableContainer = $('#queue-available-machines');
+
+    let queueHTML = '';
+    let availableHTML = '';
+
+    machines.forEach(m => {
+      const queue = queues[m.id] || [];
+      const isInQueue = queue.some(q => q.name === userName && userName);
+
+      if (m.status === 'in-use' && m.endTime) {
+        // --- In-use machine: show queue card ---
+        const minsLeft = formatMinsLeft(m.endTime);
+
+        let peopleHTML = '';
+        if (queue.length > 0) {
+          peopleHTML = '<div class="queue-list">' + queue.map((q, i) => `
+            <div class="queue-person">
+              <div class="queue-avatar">${q.name.charAt(0).toUpperCase()}</div>
+              <div class="queue-person-info">
+                <span class="queue-person-name">${q.name}</span>
+                <span class="queue-person-detail">${q.room ? 'Room ' + q.room + ' • ' : ''}Joined ${timeAgo(q.joinedAt)}</span>
+              </div>
+              <span class="queue-position">#${i + 1}</span>
+            </div>
+          `).join('') + '</div>';
+        } else {
+          peopleHTML = '<p class="queue-empty">No one in queue yet. Be the first! 🎉</p>';
+        }
+
+        let actionBtn;
+        if (isInQueue) {
+          actionBtn = `<a href="join-queue.html?machine=${m.id}" class="btn-leave-queue" style="text-decoration:none;display:block;text-align:center;">View Queue</a>`;
+        } else {
+          actionBtn = `<a href="join-queue.html?machine=${m.id}" class="btn-join-queue" style="text-decoration:none;display:block;text-align:center;">Join Queue ✌️</a>`;
+        }
+
+        queueHTML += `
+          <div class="queue-machine-card">
+            <div class="queue-machine-card-icon">📋</div>
+            <h3>Queue — ${m.name}</h3>
+            <p class="queue-subtitle">${queue.length === 0 ? 'No one in queue yet. Be the first!' : queue.length + ' in queue'}</p>
+            <div class="queue-card-status in-use">
+              <span class="status-dot red"></span> IN USE — ${minsLeft} MIN LEFT
+            </div>
+            <p style="font-size:13px;color:var(--text-light);margin-bottom:8px;">
+              Reserved by ${m.user}${m.room ? ' • Room ' + m.room : ''}
+            </p>
+            ${peopleHTML}
+            ${actionBtn}
+          </div>
+        `;
+      } else {
+        // --- Free machine: show status only, must scan QR to book ---
+        availableHTML += `
+          <div class="available-machine-card">
+            <div class="available-machine-header">
+              <div>
+                <span class="available-tag">AVAILABLE</span>
+                <h3 class="available-machine-name">${m.name}</h3>
+                <p class="available-machine-sub">Ready for your laundry load</p>
+              </div>
+              <div class="available-machine-icon">🫧</div>
+            </div>
+            <div class="scan-to-book">
+              <span class="scan-icon">📷</span>
+              <span class="scan-text">Scan the QR code on the machine to book</span>
+            </div>
+          </div>
+        `;
+      }
+    });
+
+    // If no machines are in use, show a friendly message
+    if (!queueHTML) {
+      queueHTML = `
+        <div class="queue-machine-card">
+          <div class="queue-machine-card-icon">🎉</div>
+          <h3>All machines are free!</h3>
+          <p class="queue-subtitle">No need to queue — go start a wash.</p>
+        </div>
+      `;
+    }
+
+    queueContainer.innerHTML = queueHTML;
+    availableContainer.innerHTML = availableHTML;
+  }
+
+  // ----- Join Queue -----
+  function joinQueue(machineId) {
+    const name = getUserName();
+    if (!name) {
+      showNameModal(machineId);
+      return;
+    }
+
+    const queues = getQueues();
+    const queue = queues[machineId] || [];
+
+    if (queue.some(q => q.name === name)) {
+      showToast('You\'re already in this queue.');
+      return;
+    }
+
+    queue.push({
+      name,
+      room: localStorage.getItem('userRoom') || '',
+      joinedAt: Date.now(),
+    });
+    queues[machineId] = queue;
+    saveQueues(queues);
+    render();
+
+    showToast(`You're #${queue.length} in queue for Machine ${machineId}! 🔔`);
+    requestNotifications();
+  }
+
+  // ----- Leave Queue -----
+  function leaveQueue(machineId) {
+    const name = getUserName();
+    const queues = getQueues();
+    queues[machineId] = (queues[machineId] || []).filter(q => q.name !== name);
+    saveQueues(queues);
+    render();
+    showToast('You left the queue.');
+  }
+
+  // ----- Name Modal -----
+  let pendingMachineId = null;
+
+  function showNameModal(machineId) {
+    pendingMachineId = machineId;
+    const modal = $('#name-modal');
+    modal.style.display = 'flex';
+    $('#modal-name').value = '';
+    $('#modal-room').value = '';
+    $('#modal-name').focus();
+  }
+
+  function hideNameModal() {
+    $('#name-modal').style.display = 'none';
+    pendingMachineId = null;
+  }
+
+  function saveNameAndJoin() {
+    const name = $('#modal-name').value.trim();
+    const room = $('#modal-room').value.trim();
+    if (!name) {
+      showToast('Please enter your name.');
+      return;
+    }
+    if (!room) {
+      showToast('Please enter your room number.');
+      return;
+    }
+    localStorage.setItem('userName', name);
+    localStorage.setItem('userRoom', room);
+    hideNameModal();
+    if (pendingMachineId) joinQueue(pendingMachineId);
+  }
+
+  // ----- Notifications -----
+  function requestNotifications() {
+    if ('Notification' in window && Notification.permission === 'default') {
+      Notification.requestPermission();
+    }
+  }
+
+  // ----- Auto-refresh -----
+  function startAutoRefresh() {
+    render();
+    setInterval(render, 15000);
+  }
+
+  // ----- Init -----
+  function init() {
+    startAutoRefresh();
+
+    $('#modal-save').addEventListener('click', saveNameAndJoin);
+    $('#modal-cancel').addEventListener('click', hideNameModal);
+    $('.modal-backdrop').addEventListener('click', hideNameModal);
+  }
+
+  document.addEventListener('DOMContentLoaded', init);
+
+  return { joinQueue, leaveQueue };
+})();

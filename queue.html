@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="theme-color" content="#1a5276">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <title>SpinLnk — Queue</title>
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" type="image/svg+xml" href="icons/icon-192.svg">
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="queue.css">
+</head>
+<body>
+  <div id="app">
+    
+    <header class="header">
+      <div class="header-left">
+        <span class="logo-icon">☰</span>
+        <h1 class="app-title">SpinLnk</h1>
+      </div>
+      <button class="icon-btn" id="btn-profile">👤</button>
+    </header>
+
+    <div class="queue-page">
+
+      <!-- ===== Machine Queue Cards (rendered by JS) ===== -->
+      <div id="queue-machine-list">
+        <!-- Rendered by queue.js -->
+      </div>
+
+      <!-- ===== Machine B (Dryer) — Available ===== -->
+      <div id="queue-available-machines">
+        <!-- Additional available machines rendered by JS -->
+      </div>
+
+      <!-- ===== Recommended Slots ===== -->
+      <div class="recommended-section">
+        <h3 class="recommended-title">Recommended Slots</h3>
+
+        <div class="recommended-slot">
+          <div class="recommended-slot-icon">☀️</div>
+          <div class="recommended-slot-info">
+            <span class="recommended-slot-time">Tomorrow, 09:30 AM</span>
+            <span class="recommended-slot-detail">Predicted lowest traffic</span>
+          </div>
+          <span class="recommended-slot-arrow">›</span>
+        </div>
+
+        <div class="recommended-slot">
+          <div class="recommended-slot-icon">🌙</div>
+          <div class="recommended-slot-info">
+            <span class="recommended-slot-time">Tonight, 11:00 PM</span>
+            <span class="recommended-slot-detail">Available now</span>
+          </div>
+          <span class="recommended-slot-arrow">›</span>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Bottom Nav -->
+    <nav class="bottom-nav">
+      <a href="queue.html" class="nav-item active">
+        <span class="nav-icon">📡</span>
+        <span class="nav-label">LIVE</span>
+      </a>
+      <a href="join-queue.html?machine=A" class="nav-item">
+        <span class="nav-icon">✋</span>
+        <span class="nav-label">JOIN</span>
+      </a>
+    </nav>
+
+  </div>
+
+  <!-- Name prompt modal -->
+  <div id="name-modal" class="modal" style="display:none;">
+    <div class="modal-backdrop"></div>
+    <div class="modal-content">
+      <h3>Before you join</h3>
+      <p>Enter your details so others know who's in the queue.</p>
+      <div class="form-group">
+        <label class="form-label">YOUR NAME</label>
+        <input type="text" id="modal-name" class="form-input" placeholder="Enter your name" maxlength="20">
+      </div>
+      <div class="form-group">
+        <label class="form-label">ROOM NUMBER</label>
+        <input type="text" id="modal-room" class="form-input" placeholder="Enter your room number" maxlength="10">
+      </div>
+      <button id="modal-save" class="btn btn-primary">Save & Join</button>
+      <button id="modal-cancel" class="btn btn-secondary" style="margin-top:8px;">Cancel</button>
+    </div>
+  </div>
+
+  <script src="queue.js"></script>
+</body>
+</html>

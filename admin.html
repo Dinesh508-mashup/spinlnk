@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="theme-color" content="#1a5276">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <title>SpinLnk — Admin</title>
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" type="image/svg+xml" href="icons/icon-192.svg">
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="admin.css">
+</head>
+<body>
+  <div id="admin-app">
+
+    <!-- ==================== LOGIN SCREEN ==================== -->
+    <div id="admin-login" class="admin-screen active">
+      <div class="login-page">
+        <div class="login-logo">
+          <div class="login-logo-icon">🧺</div>
+          <h1 class="login-brand">SpinLnk</h1>
+          <p class="login-tagline">Laundry intelligence for your hostel</p>
+        </div>
+
+        <div class="login-form">
+          <h2 class="login-title">Welcome Back!</h2>
+          <p class="login-subtitle">Please enter your details to sign in</p>
+
+          <div class="login-field">
+            <label class="login-label">HOSTEL ID</label>
+            <div class="login-input-wrap">
+              <span class="login-input-icon">🏠</span>
+              <input type="text" id="admin-hostel-id" class="login-input" placeholder="e.g. sunny_hostel_123">
+            </div>
+          </div>
+
+          <div class="login-field">
+            <label class="login-label">PASSWORD</label>
+            <div class="login-input-wrap">
+              <span class="login-input-icon">🔒</span>
+              <input type="password" id="admin-password" class="login-input" placeholder="••••••••">
+              <button class="login-eye-btn" id="toggle-password">👁</button>
+            </div>
+          </div>
+
+          <label class="login-remember">
+            <input type="checkbox" id="remember-me">
+            <span>Remember me</span>
+          </label>
+
+          <button id="btn-login" class="login-btn">Login →</button>
+
+          <p class="login-footer">Don't have an account? <a href="#" class="login-link">Contact Administrator</a></p>
+        </div>
+
+        <!-- Bottom dots indicator -->
+        <div class="login-dots">
+          <span class="dot active"></span>
+          <span class="dot"></span>
+          <span class="dot"></span>
+        </div>
+      </div>
+    </div>
+
+    <!-- ==================== ADMIN PANEL SCREEN ==================== -->
+    <div id="admin-panel" class="admin-screen">
+      <header class="admin-header">
+        <div class="admin-header-left">
+          <h1 class="admin-header-title">Admin Panel 🔐</h1>
+          <p class="admin-hostel-id" id="admin-hostel-label"></p>
+        </div>
+        <div class="admin-header-actions">
+          <button class="admin-qr-btn" id="btn-qr">📱</button>
+          <button class="admin-logout-btn" id="btn-logout">↩</button>
+        </div>
+      </header>
+
+      <div class="admin-content">
+        <!-- Stats Cards -->
+        <div class="admin-stats">
+          <div class="stat-card stat-blue">
+            <span class="stat-icon">🫧</span>
+            <span class="stat-label">TOTAL WASHES</span>
+            <span class="stat-value" id="stat-total-washes">0</span>
+          </div>
+          <div class="stat-card stat-green">
+            <span class="stat-icon">⏱</span>
+            <span class="stat-label">AVG WAIT</span>
+            <span class="stat-value" id="stat-avg-wait">0<small>m</small></span>
+          </div>
+          <div class="stat-card stat-teal">
+            <span class="stat-icon">📊</span>
+            <span class="stat-label">PEAK HOUR</span>
+            <span class="stat-value" id="stat-peak-hour">--</span>
+          </div>
+        </div>
+
+        <!-- Manage Machines -->
+        <div class="admin-section">
+          <h2 class="admin-section-title">Manage Machines</h2>
+          <div id="admin-machine-list" class="admin-machine-list">
+            <!-- Rendered by admin.js -->
+          </div>
+          <button id="btn-add-machine" class="admin-add-btn">⊕ Add Machine</button>
+        </div>
+
+        <!-- Hourly Traffic Chart -->
+        <div class="admin-section">
+          <div class="traffic-card">
+            <div class="traffic-header">
+              <div>
+                <h3 class="traffic-title">Hourly Traffic</h3>
+                <p class="traffic-sub">6 AM – 11 PM Peak Distribution</p>
+              </div>
+              <div class="traffic-legend">
+                <span class="legend-dot active"></span>
+                <span class="legend-label">ACTIVE</span>
+              </div>
+            </div>
+            <div class="traffic-chart">
+              <div class="traffic-bar-group">
+                <div class="traffic-bar-col">
+                  <div class="traffic-bar" style="height: 15%;"></div>
+                  <span class="traffic-label">6AM</span>
+                </div>
+                <div class="traffic-bar-col">
+                  <div class="traffic-bar" style="height: 25%;"></div>
+                  <span class="traffic-label">8AM</span>
+                </div>
+                <div class="traffic-bar-col">
+                  <div class="traffic-bar" style="height: 40%;"></div>
+                  <span class="traffic-label">10AM</span>
+                </div>
+                <div class="traffic-bar-col">
+                  <div class="traffic-bar busy" style="height: 65%;"></div>
+                  <span class="traffic-label">12PM</span>
+                </div>
+                <div class="traffic-bar-col">
+                  <div class="traffic-bar" style="height: 45%;"></div>
+                  <span class="traffic-label">2PM</span>
+                </div>
+                <div class="traffic-bar-col">
+                  <div class="traffic-bar busy" style="height: 80%;"></div>
+                  <span class="traffic-label">4PM</span>
+                </div>
+                <div class="traffic-bar-col">
+                  <div class="traffic-bar busy" style="height: 95%;"></div>
+                  <span class="traffic-label">6PM</span>
+                </div>
+                <div class="traffic-bar-col">
+                  <div class="traffic-bar busy" style="height: 85%;"></div>
+                  <span class="traffic-label">8PM</span>
+                </div>
+                <div class="traffic-bar-col">
+                  <div class="traffic-bar" style="height: 50%;"></div>
+                  <span class="traffic-label">10PM</span>
+                </div>
+                <div class="traffic-bar-col">
+                  <div class="traffic-bar" style="height: 20%;"></div>
+                  <span class="traffic-label">11PM</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ==================== QR CODE SCREEN ==================== -->
+    <div id="admin-qr" class="admin-screen">
+      <header class="admin-header">
+        <div class="admin-header-left">
+          <button class="admin-back-btn" id="btn-qr-back">←</button>
+          <h1 class="admin-header-title">QR Codes</h1>
+        </div>
+        <div class="admin-header-actions">
+          <button class="admin-logout-btn" id="btn-logout-qr">↩</button>
+        </div>
+      </header>
+
+      <div class="admin-content qr-content">
+
+        <!-- Machine QR Code Section -->
+        <div class="qr-section">
+          <h2 class="qr-section-title">Machine QR Code</h2>
+          <p class="qr-section-desc">Generate unique access keys for individual washing units. These codes allow residents to start cycles directly from their mobile device.</p>
+
+          <div class="qr-preview-card">
+            <div class="qr-preview-dark">
+              <canvas id="qr-machine-canvas" class="qr-canvas"></canvas>
+            </div>
+          </div>
+
+          <div class="qr-actions">
+            <button class="qr-action-btn qr-download" id="btn-download-machine-qr">
+              <span class="qr-action-icon">📥</span>
+              <span>Download SVG</span>
+            </button>
+            <button class="qr-action-btn qr-print" id="btn-print-machine-qr">
+              <span class="qr-action-icon">🖨</span>
+              <span>Print Label</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Room QR Code Section -->
+        <div class="qr-section">
+          <h2 class="qr-section-title">Room QR Code</h2>
+          <p class="qr-section-desc">Global access point for the laundry facility. Use this at the main entrance to check overall machine availability and room status.</p>
+
+          <div class="qr-preview-card qr-preview-light">
+            <div class="qr-preview-dark">
+              <canvas id="qr-room-canvas" class="qr-canvas"></canvas>
+            </div>
+            <div class="qr-room-labels">
+              <span class="qr-room-tag green">Safe to wash</span>
+              <span class="qr-room-tag muted">Safe to scan</span>
+            </div>
+          </div>
+
+          <div class="qr-actions">
+            <button class="qr-action-btn qr-download" id="btn-download-room-qr">
+              <span class="qr-action-icon">📥</span>
+              <span>Download SVG</span>
+            </button>
+            <button class="qr-action-btn qr-print" id="btn-print-room-qr">
+              <span class="qr-action-icon">🖨</span>
+              <span>Print Label</span>
+            </button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+
+  <script src="admin.js"></script>
+</body>
+</html>

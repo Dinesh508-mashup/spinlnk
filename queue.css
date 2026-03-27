@@ -1,0 +1,844 @@
+/* ===== Queue Page Specific Styles ===== */
+
+.queue-page {
+  padding: 0 20px 100px;
+  flex: 1;
+  overflow-y: auto;
+}
+
+/* ===== Machine Queue Card ===== */
+.queue-machine-card {
+  background: var(--card);
+  border-radius: var(--radius);
+  padding: 24px;
+  box-shadow: var(--shadow);
+  margin-bottom: 16px;
+  text-align: center;
+}
+
+.queue-machine-card-icon {
+  width: 60px;
+  height: 60px;
+  background: var(--blue-light);
+  border-radius: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 28px;
+  margin: 0 auto 14px;
+}
+
+.queue-machine-card h3 {
+  font-size: 20px;
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+
+.queue-machine-card .queue-subtitle {
+  font-size: 14px;
+  color: var(--text-light);
+  margin-bottom: 16px;
+}
+
+.btn-join-queue {
+  background: var(--primary);
+  color: white;
+  padding: 14px 32px;
+  border: none;
+  border-radius: 30px;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: background 0.2s;
+}
+
+.btn-join-queue:hover {
+  background: var(--primary-light);
+}
+
+.btn-leave-queue {
+  background: var(--bg);
+  color: var(--accent);
+  padding: 14px 32px;
+  border: 2px solid var(--border);
+  border-radius: 30px;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.2s;
+}
+
+.btn-leave-queue:hover {
+  border-color: var(--accent);
+}
+
+/* Queue Status Badge inside card */
+.queue-card-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 14px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  margin-bottom: 6px;
+}
+
+.queue-card-status.in-use {
+  background: var(--pink);
+  color: var(--accent);
+}
+
+.queue-card-status.free {
+  background: var(--mint);
+  color: var(--green);
+}
+
+.queue-time-remaining {
+  font-size: 13px;
+  color: var(--accent);
+  font-weight: 600;
+  margin-bottom: 12px;
+}
+
+/* Queue Person List */
+.queue-list {
+  margin: 14px 0;
+  text-align: left;
+}
+
+.queue-person {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.queue-person:last-child {
+  border-bottom: none;
+}
+
+.queue-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: var(--primary);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 15px;
+  flex-shrink: 0;
+}
+
+.queue-person-info {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+.queue-person-name {
+  font-weight: 700;
+  font-size: 14px;
+}
+
+.queue-person-detail {
+  font-size: 12px;
+  color: var(--text-light);
+}
+
+.queue-position {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--primary);
+  background: var(--blue-light);
+  padding: 4px 10px;
+  border-radius: 10px;
+}
+
+.queue-empty {
+  text-align: center;
+  color: var(--text-light);
+  font-size: 14px;
+  padding: 8px 0 16px;
+}
+
+/* ===== Insights Card (standalone) ===== */
+.insights-card-standalone {
+  background: var(--card);
+  border-radius: var(--radius);
+  padding: 20px;
+  box-shadow: var(--shadow);
+  margin-bottom: 16px;
+}
+
+.insights-label {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--green);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 4px;
+}
+
+.insights-header-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+
+.insights-card-title {
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.insights-icon {
+  font-size: 20px;
+}
+
+.insights-chart {
+  margin-bottom: 4px;
+}
+
+/* Peak chart bars */
+.peak-chart {
+  display: flex;
+  align-items: flex-end;
+  gap: 12px;
+  height: 100px;
+}
+
+.bar-col {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  height: 100%;
+  justify-content: flex-end;
+}
+
+.bar-col .bar {
+  width: 100%;
+  max-width: 40px;
+  background: var(--primary);
+  border-radius: 6px 6px 0 0;
+  transition: height 0.3s;
+}
+
+.bar-col .bar.busy {
+  background: var(--primary);
+}
+
+.bar-label {
+  font-size: 11px;
+  color: var(--text-light);
+  margin-top: 6px;
+  font-weight: 600;
+}
+
+/* ===== Available Machine Card ===== */
+.available-machine-card {
+  background: var(--card);
+  border-radius: var(--radius);
+  padding: 20px;
+  box-shadow: var(--shadow);
+  margin-bottom: 16px;
+}
+
+.available-machine-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 4px;
+}
+
+.available-tag {
+  display: inline-block;
+  background: var(--mint);
+  color: var(--green);
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  padding: 3px 10px;
+  border-radius: 8px;
+  letter-spacing: 0.5px;
+  margin-bottom: 6px;
+}
+
+.available-machine-icon {
+  width: 44px;
+  height: 44px;
+  background: var(--blue-light);
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 22px;
+}
+
+.available-machine-name {
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.available-machine-sub {
+  font-size: 13px;
+  color: var(--text-light);
+  margin-bottom: 14px;
+}
+
+.dryer-dots {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 14px;
+}
+
+.dryer-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--border);
+  animation: dryerPulse 1.5s ease-in-out infinite;
+}
+
+.dryer-dot:nth-child(2) { animation-delay: 0.3s; }
+.dryer-dot:nth-child(3) { animation-delay: 0.6s; }
+
+@keyframes dryerPulse {
+  0%, 100% { opacity: 0.3; }
+  50% { opacity: 1; }
+}
+
+.available-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+
+/* ===== Recommended Slots ===== */
+.recommended-section {
+  margin-bottom: 16px;
+}
+
+.recommended-title {
+  font-size: 18px;
+  font-weight: 700;
+  margin-bottom: 12px;
+}
+
+.recommended-slot {
+  background: var(--card);
+  border-radius: var(--radius);
+  padding: 16px 18px;
+  box-shadow: var(--shadow);
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 10px;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.recommended-slot:hover {
+  background: var(--bg);
+}
+
+.recommended-slot-icon {
+  font-size: 24px;
+  flex-shrink: 0;
+}
+
+.recommended-slot-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.recommended-slot-time {
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.recommended-slot-detail {
+  font-size: 12px;
+  color: var(--text-light);
+}
+
+.recommended-slot-arrow {
+  font-size: 22px;
+  color: var(--text-light);
+  font-weight: 300;
+}
+
+/* ===== Maintenance Notice ===== */
+.maintenance-banner {
+  background: var(--accent);
+  color: white;
+  border-radius: var(--radius);
+  padding: 18px 20px;
+  display: flex;
+  gap: 14px;
+  align-items: flex-start;
+  margin-bottom: 20px;
+}
+
+.maintenance-icon {
+  font-size: 22px;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.maintenance-text strong {
+  display: block;
+  font-size: 15px;
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+
+.maintenance-text p {
+  font-size: 13px;
+  opacity: 0.9;
+  line-height: 1.4;
+}
+
+/* ===== Modal ===== */
+.modal {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+}
+
+.modal-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(0,0,0,0.4);
+}
+
+.modal-content {
+  position: relative;
+  background: var(--card);
+  border-radius: 20px 20px 0 0;
+  padding: 28px 24px 32px;
+  width: 100%;
+  max-width: 430px;
+  animation: slideUp 0.3s ease;
+}
+
+.modal-content h3 {
+  font-size: 20px;
+  font-weight: 700;
+  margin-bottom: 6px;
+}
+
+.modal-content p {
+  font-size: 14px;
+  color: var(--text-light);
+  margin-bottom: 20px;
+}
+
+@keyframes slideUp {
+  from { transform: translateY(100%); }
+  to { transform: translateY(0); }
+}
+
+/* ===== Usage Insights (Queue & Bookings screen from screenshot 3) ===== */
+.insights-section {
+  margin-top: 24px;
+  margin-bottom: 16px;
+}
+
+.insights-title {
+  font-size: 18px;
+  font-weight: 700;
+  margin-bottom: 14px;
+}
+
+.insights-card {
+  background: var(--blue-light);
+  border-radius: var(--radius);
+  padding: 18px;
+  margin-bottom: 14px;
+}
+
+.slot-tags {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.slot-tag {
+  flex: 1;
+  background: var(--card);
+  border-radius: 12px;
+  padding: 12px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.slot-icon {
+  font-size: 20px;
+}
+
+.slot-name {
+  font-size: 13px;
+  font-weight: 700;
+  display: block;
+}
+
+.slot-time {
+  font-size: 11px;
+  color: var(--text-light);
+  display: block;
+}
+
+.insight-tip {
+  font-size: 12px;
+  color: var(--text-light);
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+}
+
+.insight-tip::before {
+  content: '•';
+  color: var(--primary);
+  font-weight: 700;
+}
+
+/* ===================================================
+   JOIN QUEUE PAGE (join-queue.html)
+   =================================================== */
+
+/* Step 1: Form */
+.join-page {
+  padding: 24px 20px 40px;
+  text-align: center;
+  flex: 1;
+}
+
+.join-hero-icon {
+  width: 70px;
+  height: 70px;
+  background: var(--blue-light);
+  border-radius: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 32px;
+  margin: 0 auto 16px;
+}
+
+.join-title {
+  font-size: 22px;
+  font-weight: 800;
+  margin-bottom: 6px;
+}
+
+.join-sub {
+  font-size: 14px;
+  color: var(--text-light);
+  margin-bottom: 20px;
+}
+
+.join-machine-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 16px;
+  background: var(--pink);
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--accent);
+  text-transform: uppercase;
+  margin-bottom: 6px;
+}
+
+.join-time-left {
+  font-size: 13px;
+  color: var(--text-light);
+  margin-bottom: 24px;
+}
+
+.join-form {
+  text-align: left;
+}
+
+.btn-join {
+  background: var(--primary);
+  color: white;
+  width: 100%;
+  padding: 16px;
+  border: none;
+  border-radius: 30px;
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+  margin-top: 8px;
+  transition: background 0.2s;
+}
+
+.btn-join:hover {
+  background: var(--primary-light);
+}
+
+.join-hint {
+  text-align: center;
+  font-size: 13px;
+  color: var(--text-light);
+  margin-top: 16px;
+}
+
+/* Step 2: Queued */
+.queued-page {
+  padding: 24px 20px 40px;
+  text-align: center;
+  flex: 1;
+}
+
+.queued-check {
+  font-size: 48px;
+  margin-bottom: 12px;
+}
+
+.queued-title {
+  font-size: 24px;
+  font-weight: 800;
+  margin-bottom: 4px;
+}
+
+.queued-sub {
+  font-size: 14px;
+  color: var(--text-light);
+  margin-bottom: 24px;
+}
+
+/* Position card */
+.position-card {
+  background: var(--primary);
+  color: white;
+  border-radius: var(--radius);
+  padding: 24px;
+  margin-bottom: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.position-label {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  opacity: 0.7;
+  text-transform: uppercase;
+}
+
+.position-number {
+  font-size: 52px;
+  font-weight: 900;
+  line-height: 1.1;
+}
+
+.position-name {
+  font-size: 16px;
+  font-weight: 600;
+  margin-top: 4px;
+}
+
+.position-room {
+  font-size: 13px;
+  opacity: 0.7;
+}
+
+/* Timer card */
+.queued-timer-card {
+  background: var(--card);
+  border-radius: var(--radius);
+  padding: 20px;
+  box-shadow: var(--shadow);
+  margin-bottom: 20px;
+}
+
+.queued-timer-label {
+  display: block;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text-light);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 8px;
+}
+
+.queued-timer-value {
+  display: block;
+  font-size: 40px;
+  font-weight: 800;
+  color: var(--text);
+  margin-bottom: 14px;
+}
+
+.queued-progress-bar {
+  height: 8px;
+  background: var(--border);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.queued-progress-fill {
+  height: 100%;
+  background: var(--primary);
+  border-radius: 4px;
+  transition: width 1s linear;
+  width: 0%;
+}
+
+/* Others in queue */
+.queued-others {
+  text-align: left;
+  margin-bottom: 20px;
+}
+
+.queued-others-title {
+  font-size: 16px;
+  font-weight: 700;
+  margin-bottom: 10px;
+}
+
+.queue-person-me {
+  background: var(--blue-light);
+  border-radius: 10px;
+  padding: 10px 12px !important;
+}
+
+/* Leave button */
+.btn-leave {
+  background: var(--bg);
+  color: var(--accent);
+  border: 2px solid var(--border);
+  width: 100%;
+  padding: 14px;
+  border-radius: 30px;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-leave:hover {
+  border-color: var(--accent);
+}
+
+.queued-hint {
+  font-size: 13px;
+  color: var(--text-light);
+  margin-top: 16px;
+  text-align: center;
+}
+
+/* Step 3: Machine FREE */
+.free-page {
+  padding: 60px 20px 40px;
+  text-align: center;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.free-icon {
+  font-size: 64px;
+  margin-bottom: 16px;
+}
+
+.free-title {
+  font-size: 28px;
+  font-weight: 800;
+  margin-bottom: 6px;
+  color: var(--green);
+}
+
+.free-sub {
+  font-size: 16px;
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+
+.free-detail {
+  font-size: 14px;
+  color: var(--text-light);
+  margin-bottom: 32px;
+}
+
+/* Scan to book prompt (free screen) */
+.scan-prompt {
+  background: var(--blue-light);
+  border-radius: var(--radius);
+  padding: 24px 20px;
+  margin-bottom: 20px;
+  max-width: 300px;
+  width: 100%;
+}
+
+.scan-prompt-icon {
+  font-size: 36px;
+  display: block;
+  margin-bottom: 10px;
+}
+
+.scan-prompt-text {
+  font-size: 15px;
+  color: var(--text);
+  line-height: 1.5;
+}
+
+.btn-back-queue {
+  background: none;
+  color: var(--text-light);
+  border: none;
+  font-size: 14px;
+  font-weight: 600;
+  margin-top: 14px;
+  cursor: pointer;
+  text-decoration: none;
+  text-align: center;
+  display: block;
+  padding: 10px;
+}
+
+/* Scan to book row (queue page available cards) */
+.scan-to-book {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 16px;
+  background: var(--blue-light);
+  border-radius: 12px;
+  margin-top: 12px;
+}
+
+.scan-icon {
+  font-size: 22px;
+  flex-shrink: 0;
+}
+
+.scan-text {
+  font-size: 13px;
+  color: var(--text-light);
+  font-weight: 600;
+}

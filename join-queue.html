@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="theme-color" content="#1a5276">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <title>SpinLnk — Join Queue</title>
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" type="image/svg+xml" href="icons/icon-192.svg">
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="join-queue.css">
+</head>
+<body>
+  <div id="app">
+
+    <!-- ===== STEP 1: Join Queue Form ===== -->
+    <div id="step-form" class="screen active">
+      <!-- Back bar -->
+      <div class="jq-back-bar">
+        <a href="queue.html" class="jq-back-link">← <span>Join Queue</span></a>
+      </div>
+
+      <div class="jq-form-page">
+        <!-- Washer icon -->
+        <div class="jq-hero-icon">🧼</div>
+
+        <h2 class="jq-title" id="jq-title">Join Queue for Machine A</h2>
+        <p class="jq-subtitle">Enter your details to secure your spot in line.</p>
+
+        <!-- Form fields -->
+        <div class="jq-field">
+          <div class="jq-field-icon">👤</div>
+          <div class="jq-field-inner">
+            <label class="jq-field-label">YOUR NAME</label>
+            <input type="text" id="input-name" class="jq-input" placeholder="e.g. Alex Rivera" maxlength="20">
+          </div>
+        </div>
+
+        <div class="jq-field">
+          <div class="jq-field-icon">🏠</div>
+          <div class="jq-field-inner">
+            <label class="jq-field-label">ROOM NUMBER</label>
+            <input type="text" id="input-room" class="jq-input" placeholder="e.g. 402-B" maxlength="10">
+          </div>
+        </div>
+
+        <!-- Queue Management Info -->
+        <div class="jq-info-card">
+          <div class="jq-info-icon">ℹ️</div>
+          <div class="jq-info-text">
+            <strong>Queue Management</strong>
+            <p>You'll be notified via the app when the machine is ready. Please arrive within <strong>5 minutes</strong> of the notification.</p>
+          </div>
+        </div>
+
+        <!-- Join Button -->
+        <button id="btn-join" class="jq-btn-join">Join Queue ✌️</button>
+
+        <!-- Estimated wait -->
+        <p class="jq-wait-estimate" id="jq-wait">ESTIMATED WAIT: <span id="jq-wait-time">--</span> MINS</p>
+      </div>
+
+      <!-- Bottom Nav -->
+      <nav class="bottom-nav">
+        <a href="queue.html" class="nav-item">
+          <span class="nav-icon">👥</span>
+          <span class="nav-label">QUEUE</span>
+        </a>
+        <a href="join-queue.html" class="nav-item active">
+          <span class="nav-icon">✋</span>
+          <span class="nav-label">JOIN</span>
+        </a>
+      </nav>
+    </div>
+
+    <!-- ===== STEP 2: Queued — Confirmation & Live Status ===== -->
+    <div id="step-queued" class="screen">
+      <div class="jq-back-bar">
+        <a href="queue.html" class="jq-back-link">← <span>Queue Status</span></a>
+      </div>
+
+      <div class="jq-queued-page">
+        <div class="jq-check">✅</div>
+        <h2 class="jq-queued-title">You're in the queue!</h2>
+        <p class="jq-queued-sub" id="queued-machine-info">Machine A</p>
+
+        <!-- Position card -->
+        <div class="jq-position-card">
+          <span class="jq-position-label">YOUR POSITION</span>
+          <span class="jq-position-number" id="queued-position">#1</span>
+          <span class="jq-position-name" id="queued-name">—</span>
+          <span class="jq-position-room" id="queued-room">Room —</span>
+        </div>
+
+        <!-- Timer -->
+        <div class="jq-timer-card">
+          <span class="jq-timer-label">MACHINE FREES UP IN</span>
+          <span class="jq-timer-value" id="queued-timer">--:--</span>
+          <div class="jq-progress-bar">
+            <div class="jq-progress-fill" id="queued-progress"></div>
+          </div>
+        </div>
+
+        <!-- Queue list -->
+        <div class="jq-queue-list">
+          <h3 class="jq-queue-list-title">Queue</h3>
+          <div id="queued-list"></div>
+        </div>
+
+        <p class="jq-hint">We'll ping you when the machine is free 👌</p>
+      </div>
+
+      <nav class="bottom-nav">
+        <a href="queue.html" class="nav-item">
+          <span class="nav-icon">👥</span>
+          <span class="nav-label">QUEUE</span>
+        </a>
+        <a href="join-queue.html" class="nav-item active">
+          <span class="nav-icon">✋</span>
+          <span class="nav-label">JOIN</span>
+        </a>
+      </nav>
+    </div>
+
+    <!-- ===== STEP 3: Machine FREE ===== -->
+    <div id="step-free" class="screen">
+      <div class="jq-back-bar">
+        <a href="queue.html" class="jq-back-link">← <span>Back</span></a>
+      </div>
+
+      <div class="jq-free-page">
+        <div class="jq-free-icon">🎉</div>
+        <h2 class="jq-free-title">Machine is FREE!</h2>
+        <p class="jq-free-sub" id="free-machine-name">Machine A is now available</p>
+        <p class="jq-free-detail">Hurry! First come, first served.</p>
+
+        <div class="jq-scan-prompt">
+          <span class="jq-scan-icon">📷</span>
+          <p>Go to the machine and <strong>scan the QR code</strong> to confirm your booking</p>
+        </div>
+        <a href="queue.html" class="jq-btn-back">Back to Queue</a>
+      </div>
+
+      <nav class="bottom-nav">
+        <a href="queue.html" class="nav-item">
+          <span class="nav-icon">👥</span>
+          <span class="nav-label">QUEUE</span>
+        </a>
+        <a href="join-queue.html" class="nav-item active">
+          <span class="nav-icon">✋</span>
+          <span class="nav-label">JOIN</span>
+        </a>
+      </nav>
+    </div>
+
+  </div>
+
+  <script src="join-queue.js"></script>
+</body>
+</html>

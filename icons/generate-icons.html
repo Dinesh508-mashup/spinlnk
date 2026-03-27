@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html>
+<head><title>Generate Icons</title></head>
+<body>
+<h3>Right-click each image below and "Save image as" to save as PNG</h3>
+<h4>icon-192.png</h4>
+<canvas id="c192" width="192" height="192"></canvas>
+<h4>icon-512.png</h4>
+<canvas id="c512" width="512" height="512"></canvas>
+<script>
+function drawIcon(canvas) {
+  const s = canvas.width;
+  const ctx = canvas.getContext('2d');
+  const scale = s / 192;
+
+  // Background
+  ctx.fillStyle = '#1a5276';
+  ctx.beginPath();
+  ctx.roundRect(0, 0, s, s, 40 * scale);
+  ctx.fill();
+
+  // Washing machine body circle
+  ctx.strokeStyle = 'white';
+  ctx.lineWidth = 6 * scale;
+  ctx.beginPath();
+  ctx.arc(s/2, s * 0.54, 52 * scale, 0, Math.PI * 2);
+  ctx.stroke();
+
+  // Inner circle
+  ctx.lineWidth = 3 * scale;
+  ctx.globalAlpha = 0.5;
+  ctx.beginPath();
+  ctx.arc(s/2, s * 0.54, 36 * scale, 0, Math.PI * 2);
+  ctx.stroke();
+  ctx.globalAlpha = 1;
+
+  // Water wave
+  ctx.lineWidth = 4 * scale;
+  ctx.lineCap = 'round';
+  ctx.beginPath();
+  ctx.moveTo(s * 0.42, s * 0.52);
+  ctx.quadraticCurveTo(s * 0.46, s * 0.44, s * 0.5, s * 0.52);
+  ctx.quadraticCurveTo(s * 0.54, s * 0.60, s * 0.58, s * 0.52);
+  ctx.stroke();
+
+  // Top panel
+  ctx.fillStyle = 'white';
+  ctx.beginPath();
+  ctx.roundRect(56 * scale, 42 * scale, 80 * scale, 12 * scale, 6 * scale);
+  ctx.fill();
+
+  // Buttons on panel
+  ctx.fillStyle = '#1a5276';
+  ctx.beginPath();
+  ctx.arc(76 * scale, 48 * scale, 3 * scale, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.beginPath();
+  ctx.arc(90 * scale, 48 * scale, 3 * scale, 0, Math.PI * 2);
+  ctx.fill();
+
+  // Convert to downloadable link
+  const link = document.createElement('a');
+  link.download = `icon-${canvas.width}.png`;
+  link.href = canvas.toDataURL('image/png');
+  link.textContent = `Download icon-${canvas.width}.png`;
+  link.style.display = 'block';
+  link.style.margin = '10px 0';
+  canvas.parentNode.insertBefore(link, canvas.nextSibling);
+}
+
+drawIcon(document.getElementById('c192'));
+drawIcon(document.getElementById('c512'));
+</script>
+</body>
+</html>
