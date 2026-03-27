@@ -117,10 +117,35 @@ const App = (() => {
     popup.style.display = 'none';
   }
 
+  // ----- Fetch live queue from Supabase -----
+  async function fetchLiveQueues() {
+    if (!hostelId) return null;
+    try {
+      const dbQueue = await Supabase.getQueueEntries(hostelId);
+      const queueMap = {};
+      dbQueue.forEach(q => {
+        if (!queueMap[q.machine_key]) queueMap[q.machine_key] = [];
+        queueMap[q.machine_key].push({
+          name: q.user_name,
+          room: q.room,
+          joinedAt: new Date(q.joined_at).getTime(),
+        });
+      });
+      setStore('machineQueues', queueMap);
+      return queueMap;
+    } catch (err) {
+      console.error('Queue fetch error:', err);
+      return null;
+    }
+  }
+
   // ----- Render Machine List (Home Dashboard) -----
-  function renderMachines() {
+  async function renderMachines() {
     const list = $('#machine-list');
     if (!list) return;
+
+    // Fetch latest queue data from Supabase
+    const liveQueues = await fetchLiveQueues();
 
     list.innerHTML = state.machines.map(m => {
       const isFree = m.status === 'free';
@@ -145,7 +170,7 @@ const App = (() => {
         `;
       } else {
         const minsLeft = formatMinsLeft(m.endTime);
-        const queues = getStore('machineQueues', {});
+        const queues = liveQueues || getStore('machineQueues', {});
         const queue = queues[m.id] || [];
 
         let queueHTML = '';

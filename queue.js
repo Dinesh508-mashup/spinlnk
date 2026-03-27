@@ -236,44 +236,60 @@ const Queue = (() => {
       return;
     }
 
-    const queues = getQueues();
-    const queue = queues[machineId] || [];
-
-    if (queue.some(q => q.name === name)) {
-      showToast('You\'re already in this queue.');
-      return;
-    }
-
-    const room = localStorage.getItem('userRoom') || '';
-    queue.push({ name, room, joinedAt: Date.now() });
-    queues[machineId] = queue;
-    saveQueues(queues);
-
-    // Sync to Supabase
+    // Check from DB if already in queue
     if (hostelId) {
-      try { await Supabase.addQueueEntry(hostelId, machineId, name, room); }
-      catch (err) { console.error('DB queue join error:', err); }
+      try {
+        const dbQueue = await Supabase.getQueueEntries(hostelId);
+        const alreadyIn = dbQueue.some(q => q.machine_key === machineId && q.user_name === name);
+        if (alreadyIn) {
+          showToast('You\'re already in this queue.');
+          return;
+        }
+        // Add to Supabase first (single source of truth)
+        const room = localStorage.getItem('userRoom') || '';
+        await Supabase.addQueueEntry(hostelId, machineId, name, room);
+      } catch (err) {
+        console.error('DB queue join error:', err);
+      }
+    } else {
+      // Fallback to localStorage only
+      const queues = getQueues();
+      const queue = queues[machineId] || [];
+      if (queue.some(q => q.name === name)) {
+        showToast('You\'re already in this queue.');
+        return;
+      }
+      const room = localStorage.getItem('userRoom') || '';
+      queue.push({ name, room, joinedAt: Date.now() });
+      queues[machineId] = queue;
+      saveQueues(queues);
     }
 
-    render();
-    showToast(`You're #${queue.length} in queue for Machine ${machineId}! 🔔`);
+    // Re-fetch and render with latest DB data
+    await render();
+
+    // Get updated position
+    const updatedQueues = getQueues();
+    const pos = (updatedQueues[machineId] || []).findIndex(q => q.name === name) + 1;
+    showToast(`You're #${pos || '?'} in queue for Machine ${machineId}! 🔔`);
     requestNotifications();
   }
 
   // ----- Leave Queue -----
   async function leaveQueue(machineId) {
     const name = getUserName();
-    const queues = getQueues();
-    queues[machineId] = (queues[machineId] || []).filter(q => q.name !== name);
-    saveQueues(queues);
 
-    // Sync to Supabase
+    // Remove from Supabase first
     if (hostelId) {
       try { await Supabase.removeQueueEntry(hostelId, machineId, name); }
       catch (err) { console.error('DB queue leave error:', err); }
+    } else {
+      const queues = getQueues();
+      queues[machineId] = (queues[machineId] || []).filter(q => q.name !== name);
+      saveQueues(queues);
     }
 
-    render();
+    await render();
     showToast('You left the queue.');
   }
 
