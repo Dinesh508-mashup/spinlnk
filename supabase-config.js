@@ -1,4 +1,10 @@
-// ===== SpinLnk — Supabase Configuration =====
+// ===== SpinLnk — App Configuration =====
+
+// ---- CHANGE THIS to your Vercel URL when ready ----
+const SPINLNK_BASE_URL = 'https://YOUR_VERCEL_URL.vercel.app/';
+// ---------------------------------------------------
+
+// ===== Supabase Configuration =====
 
 const Supabase = (() => {
   const SUPABASE_URL = 'https://wskoxxsglnkgzrtdxefp.supabase.co';
@@ -124,3 +130,22 @@ const Supabase = (() => {
     getQueueEntries, addQueueEntry, removeQueueEntry, clearMachineQueue,
   };
 })();
+
+// ===== Auto-append hostel param to all internal links =====
+document.addEventListener('DOMContentLoaded', () => {
+  const params = new URLSearchParams(window.location.search);
+  const hostel = params.get('hostel') || localStorage.getItem('spinlnk_userHostel');
+  if (!hostel) return;
+
+  document.querySelectorAll('a[href]').forEach(a => {
+    const href = a.getAttribute('href');
+    if (!href || href.startsWith('http') || href.startsWith('#') || href.startsWith('mailto')) return;
+    if (href.includes('.html')) {
+      const url = new URL(href, window.location.href);
+      if (!url.searchParams.has('hostel')) {
+        url.searchParams.set('hostel', hostel);
+        a.setAttribute('href', url.pathname.split('/').pop() + url.search);
+      }
+    }
+  });
+});

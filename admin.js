@@ -305,7 +305,7 @@ const Admin = (() => {
   }
 
   async function renderQRScreen() {
-    const baseUrl = 'https://dinesh508-mashup.github.io/spinlnk/';
+    const baseUrl = SPINLNK_BASE_URL;
 
     // Machine QR — links to index.html with hostel param
     const machineUrl = `${baseUrl}index.html?hostel=${hostelId}`;

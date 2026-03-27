@@ -431,15 +431,16 @@ const App = (() => {
 
       let statusText;
       let btnHTML;
+      const hostelParam = hostelId ? `?hostel=${hostelId}` : '';
       if (isFree) {
         statusText = 'Ready for your laundry load';
-        btnHTML = `<a href="queue.html" class="qs-btn">Join Queue ✌️</a>`;
+        btnHTML = `<a href="queue.html${hostelParam}" class="qs-btn">Join Queue ✌️</a>`;
       } else {
         const minsLeft = formatMinsLeft(m.endTime);
         statusText = queue.length === 0
           ? 'No one in queue yet. Be the first! 🎉'
           : `${queue.length} waiting in queue`;
-        btnHTML = `<a href="queue.html" class="qs-btn">Join Queue ✌️</a>`;
+        btnHTML = `<a href="queue.html${hostelParam}" class="qs-btn">Join Queue ✌️</a>`;
       }
 
       return `

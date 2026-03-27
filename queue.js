@@ -109,10 +109,11 @@ const Queue = (() => {
         }
 
         let actionBtn;
+        const hostelParam = hostelId ? `&hostel=${hostelId}` : '';
         if (isInQueue) {
-          actionBtn = `<a href="join-queue.html?machine=${m.id}" class="btn-leave-queue" style="text-decoration:none;display:block;text-align:center;">View Queue</a>`;
+          actionBtn = `<a href="join-queue.html?machine=${m.id}${hostelParam}" class="btn-leave-queue" style="text-decoration:none;display:block;text-align:center;">View Queue</a>`;
         } else {
-          actionBtn = `<a href="join-queue.html?machine=${m.id}" class="btn-join-queue" style="text-decoration:none;display:block;text-align:center;">Join Queue ✌️</a>`;
+          actionBtn = `<a href="join-queue.html?machine=${m.id}${hostelParam}" class="btn-join-queue" style="text-decoration:none;display:block;text-align:center;">Join Queue ✌️</a>`;
         }
 
         queueHTML += `
