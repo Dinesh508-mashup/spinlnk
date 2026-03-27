@@ -93,8 +93,8 @@ const Admin = (() => {
     });
   }
 
-  // ----- Login -----
-  function handleLogin() {
+  // ----- Login (validates against Supabase) -----
+  async function handleLogin() {
     const hostelInput = $('#admin-hostel-id').value.trim();
     const password = $('#admin-password').value;
 
@@ -103,39 +103,54 @@ const Admin = (() => {
       return;
     }
 
-    // Store the hostel credentials in a registry
-    // For now, any hostel ID + password "spinlnk" works (demo)
-    // In production, this would validate against a server/database
-    const registeredHostels = JSON.parse(localStorage.getItem('spinlnk_hostels') || '{}');
     const normalizedId = hostelInput.toLowerCase().replace(/\s+/g, '_');
 
-    if (registeredHostels[normalizedId]) {
-      // Existing hostel — check password
-      if (registeredHostels[normalizedId].password !== password) {
-        showToast('Invalid password. Try again.');
-        return;
+    try {
+      const hostel = await Supabase.getHostel(normalizedId);
+
+      if (hostel) {
+        // Existing hostel — check password
+        if (hostel.password !== password) {
+          showToast('Invalid password. Try again.');
+          return;
+        }
+      } else {
+        // New hostel — register in Supabase
+        await Supabase.createHostel(normalizedId, hostelInput, password);
+
+        // Add default machines A and B
+        await Supabase.addMachine(normalizedId, 'A', 'Machine A', 'washer');
+        await Supabase.addMachine(normalizedId, 'B', 'Machine B', 'washer');
       }
-    } else {
-      // New hostel — register it
-      registeredHostels[normalizedId] = {
-        password: password,
-        name: hostelInput,
-        createdAt: Date.now(),
-      };
-      localStorage.setItem('spinlnk_hostels', JSON.stringify(registeredHostels));
+
+      // Set active hostel
+      hostelId = normalizedId;
+      localStorage.setItem('spinlnk_activeHostel', normalizedId);
+      localStorage.setItem('spinlnk_adminLoggedIn', 'true');
+
+      // Sync machines to localStorage for offline use
+      await syncMachinesToLocal();
+
+      updateHostelLabel();
+      showScreen('admin-panel');
+      renderPanel();
+      showToast(`Welcome! Hostel: ${hostelInput}`);
+    } catch (err) {
+      console.error('Login error:', err);
+      showToast('Connection error. Please try again.');
     }
+  }
 
-    // Set active hostel
-    hostelId = normalizedId;
-    localStorage.setItem('spinlnk_activeHostel', normalizedId);
-    localStorage.setItem('spinlnk_adminLoggedIn', 'true');
-
-    // Show hostel name in header
-    updateHostelLabel();
-
-    showScreen('admin-panel');
-    renderPanel();
-    showToast(`Welcome! Hostel: ${hostelInput}`);
+  // Sync Supabase machines to localStorage so index.html works
+  async function syncMachinesToLocal() {
+    try {
+      const machines = await Supabase.getMachines(hostelId);
+      const list = machines.map(m => ({ id: m.machine_key, name: m.name, type: m.type }));
+      setStore('adminMachineList', list);
+      localStorage.setItem(`spinlnk_${hostelId}_adminMachineList`, JSON.stringify(list));
+    } catch (err) {
+      console.error('Sync error:', err);
+    }
   }
 
   function handleLogout() {
@@ -211,7 +226,7 @@ const Admin = (() => {
   }
 
   // ----- Add Machine -----
-  function addMachine() {
+  async function addMachine() {
     const list = getMachineList();
     const existingIds = list.map(m => m.id);
 
@@ -231,12 +246,18 @@ const Admin = (() => {
 
     list.push({ id: nextLetter, name: `Machine ${nextLetter}`, type: 'washer' });
     saveMachineList(list);
+
+    // Save to Supabase
+    try {
+      await Supabase.addMachine(hostelId, nextLetter, `Machine ${nextLetter}`, 'washer');
+    } catch (err) { console.error('DB add error:', err); }
+
     renderMachineList();
     showToast(`Machine ${nextLetter} added!`);
   }
 
   // ----- Delete Machine -----
-  function deleteMachine(machineId) {
+  async function deleteMachine(machineId) {
     const list = getMachineList();
     const updated = list.filter(m => m.id !== machineId);
 
@@ -247,7 +268,13 @@ const Admin = (() => {
 
     saveMachineList(updated);
 
-    // Clear queue for this machine
+    // Delete from Supabase
+    try {
+      await Supabase.deleteMachine(hostelId, machineId);
+      await Supabase.clearMachineQueue(hostelId, machineId);
+    } catch (err) { console.error('DB delete error:', err); }
+
+    // Clear local queue
     const queues = getStore('machineQueues', {});
     delete queues[machineId];
     setStore('machineQueues', queues);
@@ -314,7 +341,7 @@ const Admin = (() => {
     }
   }
 
-  function renderQRScreen() {
+  async function renderQRScreen() {
     const baseUrl = window.location.origin + window.location.pathname.replace('admin.html', '');
 
     // Machine QR — links to index.html with hostel param
@@ -324,6 +351,11 @@ const Admin = (() => {
     // Room QR — links to queue.html with hostel param
     const roomUrl = `${baseUrl}queue.html?hostel=${hostelId}`;
     drawQR('qr-room-canvas', roomUrl);
+
+    // Save QR URLs to Supabase
+    try {
+      await Supabase.updateHostelQR(hostelId, machineUrl, roomUrl);
+    } catch (err) { console.error('QR save error:', err); }
   }
 
   function downloadQRAsSVG(canvasId, filename) {
