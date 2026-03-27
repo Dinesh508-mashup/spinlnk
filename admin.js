@@ -47,10 +47,8 @@ const Admin = (() => {
           return;
         }
       } else {
-        // New hostel — register + add default machines
+        // New hostel — register (admin adds machines themselves)
         await Supabase.createHostel(normalizedId, hostelInput, password);
-        await Supabase.addMachine(normalizedId, 'A', 'Machine A', 'washer');
-        await Supabase.addMachine(normalizedId, 'B', 'Machine B', 'washer');
       }
 
       hostelId = normalizedId;
