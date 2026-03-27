@@ -36,7 +36,7 @@ const Admin = (() => {
       return;
     }
 
-    const normalizedId = hostelInput.toLowerCase().replace(/\s+/g, '_');
+    const normalizedId = hostelInput.toLowerCase().replace(/[^a-z0-9]/g, '_').replace(/_+/g, '_').replace(/^_|_$/g, '');
 
     try {
       const hostel = await Supabase.getHostel(normalizedId);
