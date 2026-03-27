@@ -283,22 +283,25 @@ const Admin = (() => {
     showToast(`Machine ${machineId} removed.`);
   }
 
-  // ===== QR Code Generation (using qrcode.js library) =====
+  // ===== QR Code Generation (using qrcode-generator library) =====
   function drawQR(containerId, text) {
     const container = document.getElementById(containerId);
     if (!container) return;
-    QRCode.toDataURL(text, {
-      width: 200,
-      margin: 2,
-      color: { dark: '#2c3e50', light: '#ffffff' },
-      errorCorrectionLevel: 'M',
-    }, (err, url) => {
-      if (err) {
-        console.error('QR generation error:', err);
-        return;
+    try {
+      const qr = qrcode(0, 'M');
+      qr.addData(text);
+      qr.make();
+      container.innerHTML = qr.createImgTag(5, 10);
+      const img = container.querySelector('img');
+      if (img) {
+        img.style.width = '200px';
+        img.style.height = '200px';
+        img.style.borderRadius = '4px';
+        img.alt = 'QR Code';
       }
-      container.innerHTML = `<img src="${url}" alt="QR Code" class="qr-img" style="width:200px;height:200px;border-radius:4px;">`;
-    });
+    } catch (err) {
+      console.error('QR generation error:', err);
+    }
   }
 
   async function renderQRScreen() {
