@@ -140,7 +140,13 @@ const App = (() => {
     if (!list) return;
 
     // Fetch latest queue data from Supabase
-    const liveQueues = await fetchLiveQueues();
+    let liveQueues = null;
+    try { liveQueues = await fetchLiveQueues(); } catch (e) { /* use localStorage */ }
+
+    if (state.machines.length === 0) {
+      list.innerHTML = '<p class="empty-state">No machines available. Scan a valid QR code.</p>';
+      return;
+    }
 
     list.innerHTML = state.machines.map(m => {
       const isFree = m.status === 'free';
@@ -752,6 +758,12 @@ const App = (() => {
         machine.cycle = null;
         machine.endTime = null;
         notifyQueueOnFree(machine.id);
+        // Update DB to mark as free
+        if (hostelId) {
+          Supabase.updateMachine(hostelId, machine.id, {
+            status: 'free', user_name: null, room: null, cycle: null, end_time: null,
+          }).catch(() => {});
+        }
       } else {
         machine.status = s.status;
         machine.user = s.user;
@@ -760,7 +772,11 @@ const App = (() => {
         machine.endTime = s.endTime;
       }
     });
-    saveMachineState();
+    // Save to localStorage only (don't write back to DB — it's the source of truth)
+    const localData = state.machines.map(m => ({
+      id: m.id, status: m.status, user: m.user, room: m.room, cycle: m.cycle, endTime: m.endTime,
+    }));
+    setStore('machineState', localData);
   }
 
   // ----- QR Code URL Handling -----
