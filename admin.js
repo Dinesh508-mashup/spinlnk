@@ -181,8 +181,20 @@ const Admin = (() => {
     renderMachineList();
   }
 
-  function renderStats() {
-    const history = getStore('washHistory', []);
+  async function renderStats() {
+    // Fetch wash history from Supabase
+    let history = [];
+    if (hostelId) {
+      try {
+        history = await Supabase.getWashHistory(hostelId);
+      } catch (err) {
+        console.error('Stats fetch error:', err);
+        history = getStore('washHistory', []);
+      }
+    } else {
+      history = getStore('washHistory', []);
+    }
+
     $('#stat-total-washes').textContent = history.length;
 
     if (history.length > 0) {

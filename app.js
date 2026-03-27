@@ -361,6 +361,20 @@ const App = (() => {
     `).join('');
   }
 
+  // ----- Save wash history to Supabase -----
+  function saveHistoryToDB(machine, duration) {
+    if (!hostelId) return;
+    Supabase.addWashHistory(hostelId, {
+      machine_key: machine.id,
+      machine_name: machine.name,
+      user_name: machine.user || 'Unknown',
+      room: machine.room || null,
+      cycle: machine.cycle || 'Unknown',
+      duration: typeof duration === 'number' ? duration : null,
+      ended_at: new Date().toISOString(),
+    }).catch(err => console.error('DB history error:', err));
+  }
+
   // ----- Done Early / Moved Clothes for specific machine (from bookings) -----
   function doneEarlyFor(machineId) {
     const machine = state.machines.find(m => m.id === machineId);
@@ -375,6 +389,7 @@ const App = (() => {
     };
     state.history.unshift(historyEntry);
     setStore('washHistory', state.history.slice(0, 20));
+    saveHistoryToDB(machine, 'Early');
     notifyQueueOnFree(machine.id);
     freeMachine(machine);
     showToast(`${machine.name} freed up!`);
@@ -414,6 +429,7 @@ const App = (() => {
     };
     state.history.unshift(historyEntry);
     setStore('washHistory', state.history.slice(0, 20));
+    saveHistoryToDB(machine, 'Moved');
     notifyQueueOnFree(machine.id);
     freeMachine(machine);
 
@@ -604,6 +620,20 @@ const App = (() => {
     machine.endTime = endTime;
 
     saveMachineState();
+
+    // Log wash start to Supabase
+    if (hostelId) {
+      Supabase.addWashHistory(hostelId, {
+        machine_key: machine.id,
+        machine_name: machine.name,
+        user_name: name,
+        room: room,
+        cycle: cycle.name,
+        duration: cycle.minutes,
+        started_at: new Date().toISOString(),
+      }).catch(err => console.error('DB wash log error:', err));
+    }
+
     requestNotificationPermission();
     showToast(`${machine.name} wash started!`);
     showScreen('screen-bookings');
