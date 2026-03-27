@@ -283,62 +283,17 @@ const Admin = (() => {
     showToast(`Machine ${machineId} removed.`);
   }
 
-  // ===== QR Code Generation =====
-  function generateQRMatrix(text) {
-    const size = 25;
-    const matrix = [];
-    let hash = 0;
-    for (let i = 0; i < text.length; i++) {
-      hash = ((hash << 5) - hash + text.charCodeAt(i)) | 0;
-    }
-
-    for (let y = 0; y < size; y++) {
-      matrix[y] = [];
-      for (let x = 0; x < size; x++) {
-        if ((x < 7 && y < 7) || (x >= size - 7 && y < 7) || (x < 7 && y >= size - 7)) {
-          const isOuter = x === 0 || y === 0 || x === 6 || y === 6 || x === size - 1 || y === size - 1 ||
-                          x === size - 7 || y === size - 7;
-          const isInner = (x >= 2 && x <= 4 && y >= 2 && y <= 4) ||
-                          (x >= size - 5 && x <= size - 3 && y >= 2 && y <= 4) ||
-                          (x >= 2 && x <= 4 && y >= size - 5 && y <= size - 3);
-          matrix[y][x] = isOuter || isInner ? 1 : 0;
-        } else if (x === 6) {
-          matrix[y][x] = y % 2 === 0 ? 1 : 0;
-        } else if (y === 6) {
-          matrix[y][x] = x % 2 === 0 ? 1 : 0;
-        } else {
-          const seed = (hash * (x + 1) * (y + 1) + x * 31 + y * 37) & 0xFFFF;
-          matrix[y][x] = (seed % 3 === 0 || seed % 5 === 0) ? 1 : 0;
-        }
-      }
-    }
-    return matrix;
-  }
-
+  // ===== QR Code Generation (using qrcode.js library) =====
   function drawQR(canvasId, text) {
     const canvas = document.getElementById(canvasId);
     if (!canvas) return;
-    const ctx = canvas.getContext('2d');
-    const matrix = generateQRMatrix(text);
-    const size = matrix.length;
-    const cellSize = 6;
-    const padding = 10;
-    const totalSize = size * cellSize + padding * 2;
-
-    canvas.width = totalSize;
-    canvas.height = totalSize;
-
-    ctx.fillStyle = '#ffffff';
-    ctx.fillRect(0, 0, totalSize, totalSize);
-
-    ctx.fillStyle = '#2c3e50';
-    for (let y = 0; y < size; y++) {
-      for (let x = 0; x < size; x++) {
-        if (matrix[y][x]) {
-          ctx.fillRect(padding + x * cellSize, padding + y * cellSize, cellSize, cellSize);
-        }
-      }
-    }
+    QRCode.toCanvas(canvas, text, {
+      width: 200,
+      margin: 2,
+      color: { dark: '#2c3e50', light: '#ffffff' },
+    }, (err) => {
+      if (err) console.error('QR generation error:', err);
+    });
   }
 
   async function renderQRScreen() {
